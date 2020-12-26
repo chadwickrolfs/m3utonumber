@@ -1,5 +1,5 @@
 import sys
-from os import walk as oswalk
+import os
 import os.path as ospath
 from shutil import move as shmove
 
@@ -14,23 +14,35 @@ class NumberFiles(object):
         self.dirtowalk = dirtowalk
 
     def numberfiles(self):
-        m3ufiles = glob.glob(f'{self.dirtowalk}/**/*.m3u', recursive=True)
+        scriptdir = os.getcwd()
+        m3ufiles = glob.glob(
+                f'{self.dirtowalk}/**/*.m3u',
+                recursive=True)
         for m3ufile in m3ufiles:
-            m3udir = os.dirname(m3ufile)
+            oggs = []
+            oggdir = set()
+
+            m3udir. m3ufilename = ospath.split(m3ufile)
+            os.chdir(m3udir)
+
             with open(m3ufile, 'r+') as m3ufile_h:
-                oggs = [os.path.basename(oggfile) for oggfile in m3ufile_h.readlines()]
+                for tracknumber, oggfile in enumerate(m3ufile_h):
+                    oggfilename = ospath.basename(oggfile)
+                    oggdirname = ospath.dirname(oggfile)
+                    oggdir.add(oggdirname)
+
+                    if oggfilename[0:2].isdigit():
+                        oggs.append(oggfilename)
+                    else:
+                        numberedogg = f'{tracknumber:#02}_{oggfilename}'
+                        oggs.append(numberedogg)
+                        shmove(
+                                oggfile,
+                                ospath.join(oggdirname, numberedogg))
+
                 m3ufile_h.truncate()
-                m3ufile.readlines(oggs)
-            # determine where the ogg directory is relative to the m3u file
-            # move m3u file into ogg directory
-            for track, ogg in enumerate(oggs):
-                shmove(ogg, f'{track:#02}-{ogg}')
+                m3ufile_h.writelines(oggs)
 
-
-# find m3u files
-# g = glob.glob(f'{dirtowalk}/**/*.m3u', recursive=True)
-# readlines from m3u file, only the filename
-#     with open(g[0], 'r+') as gf
-#       oggs = [os.path.basename(x) for x in gf.readlines()]
-#     compare with each ogg file
-#     rename ogg file with number
+            oggdir = oggdir[0]
+            if m3udir != oggdir:
+                shmove(m3ufile, os.path.join(oggdir, m3ufilename))
