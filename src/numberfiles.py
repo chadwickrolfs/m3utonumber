@@ -14,27 +14,18 @@ class NumberFiles(object):
         self.dirtowalk = dirtowalk
 
     def numberfiles(self):
-        for dirpath, dnames, filenames in oswalk(self.dirtowalk):
-            for filename in filenames:
-                if filename.endswith('m3u'):
-                    print("found a playlist - contents:\n")
-                    playlistpath = ospath.join(dirpath, filename)
-                    playlistfile = open(playlistpath, "r")
-                    for tracknumber, filename in enumerate(playlistfile):
-                        (headpart, addnumberpart) = ospath.split(filename)
-                        if addnumberpart[0:2].isdigit():
-                            print("{0} already numbered".format(addnumberpart))
-                        else:
-                            addednumber = "{0:#02}-{1}".format(tracknumber, addnumberpart)
-                            if dirdepth == 2:
-                                exifile = ospath.join(dirpath, headpart, addnumberpart).strip("\n")
-                                newfile = ospath.join(dirpath, headpart, addednumber).strip("\n")
-                            else:
-                                exifile = ospath.join(self.dirtowalk, headpart, addnumberpart).strip("\n")
-                                newfile = ospath.join(self.dirtowalk, headpart, addednumber).strip("\n")
+        m3ufiles = glob.glob(f'{self.dirtowalk}/**/*.m3u', recursive=True)
+        for m3ufile in m3ufiles:
+            m3udir = os.dirname(m3ufile)
+            with open(m3ufile, 'r+') as m3ufile_h:
+                oggs = [os.path.basename(oggfile) for oggfile in m3ufile_h.readlines()]
+                m3ufile_h.truncate()
+                m3ufile.readlines(oggs)
+            # determine where the ogg directory is relative to the m3u file
+            # move m3u file into ogg directory
+            for track, ogg in enumerate(oggs):
+                shmove(ogg, f'{track:#02}-{ogg}')
 
-                        print("moving '{0}' '{1}'".format(exifile, newfile))
-                        shmove(exifile, newfile)
 
 # find m3u files
 # g = glob.glob(f'{dirtowalk}/**/*.m3u', recursive=True)
