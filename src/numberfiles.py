@@ -3,10 +3,12 @@ import os.path as ospath
 from shutil import move as shmove
 from pathlib import Path
 
+
 class NumberFiles(object):
     '''
-    Class to check for m3u playlists and subsequently add numbers to the front of tracks.
-    dirtowalk 
+    Class to check for m3u playlists and subsequently add numbers to the front
+    of tracks.
+    dirtowalk
     '''
 
     def __init__(self, dirtowalk):
@@ -48,7 +50,8 @@ class NumberFiles(object):
     def ogg_tracks(self):
         self.oggs = []
         self.oggdir = set()
-        for self.tracknumber, self.oggfile in enumerate(self.oggtracks):
+        for self.tracknumber, self.oggfile in enumerate(
+                self.oggtracks):
             oggglobbed = self.get_oggglob()
 
             self.oggfile = oggglobbed[0]
@@ -82,4 +85,6 @@ class NumberFiles(object):
         if self.oggdir:
             oggdir = self.oggdir.pop()
             if self.m3udir != oggdir:
-                shmove(self.m3ufile, os.path.join(oggdir, self.m3ufilename))
+                shmove(
+                        self.m3ufile,
+                        os.path.join(oggdir, self.m3ufilename))
