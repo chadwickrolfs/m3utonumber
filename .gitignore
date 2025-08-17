@@ -3,3 +3,5 @@ test/BUm3utree
 test/m3u
 test/BUoggtree
 test/oggtree
+
+__pycache__/
