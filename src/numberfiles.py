@@ -12,6 +12,7 @@ class playlist:
 
 @dataclass
 class playfile:
+    position: int
     original_path: str
 
 
@@ -25,36 +26,24 @@ class NumberFiles(object):
     def __init__(self, dirtowalk):
         '''click '''
         self.dirtowalk = dirtowalk
+        self.playlists: list = list()
 
-    def numberfiles(self):
-        m3ufiles = self.get_m3ufiles()
+    def list_playlists(self):
+        self.get_m3ufiles()
 
-        for self.m3ufile in m3ufiles:
-            print(f'\nDEBUG:\nm3ufile: {self.m3ufile}\n')
-            filelist = [
-                    playfile(listfile)
-                    for listfile
-                    in self.m3ufile.read_text.split("\n")
-            ]
-            self.playlist = playlist(
-                self.m3ufile.name,
-                self.m3ufile.parent,
-                filelist,
-            )
+        for self.m3ufile in self.m3ufiles:
+            # print(f'\nDEBUG:\nm3ufile: {self.m3ufile}\n')
+            self.make_playlist()
+            self.playlists.append(self.playlist)
 
-            # not sure why this happens
-            # better to remove before the loop
-            if f'{self.playlist.m3udir}{os.sep}' == self.dirtowalk:
-                print(f"found '{self.playlist.m3udir}{os.sep}'")
-                continue
+            # try to get a good list of playlists first
+            continue
 
-            self.oggtracks = self.get_oggtracks()
-            if not self.oggtracks:
-                continue
-
-            line0 = self.oggtracks[0]
+            line0 = self.playlist.m3ulist[0]
             if (line0.startswith('#') or line0.startswith('<')):
-                os.remove(self.m3ufile)
+                print(f"extended m3u: {self.playlist.m3uname}")
+                # os.remove(self.m3ufile)
+                # TODO: parse it !
                 continue
 
             try:
@@ -65,17 +54,26 @@ class NumberFiles(object):
 
     def get_m3ufiles(self):
         m3uglob = '*.m3u'
-        return sorted(self.dirtowalk.rglob(m3uglob))
+        self.m3ufiles = sorted(self.dirtowalk.rglob(m3uglob))
+        return self.m3ufiles
 
-    def get_oggtracks(self):
-        with open(self.m3ufile) as m3ufile_h:
-            return m3ufile_h.readlines()
+    def make_playlist(self):
+        filelist = [
+                playfile(pos, listfile)
+                for pos, listfile
+                in enumerate(self.m3ufile.read_text().split("\n"))
+        ]
+        self.playlist = playlist(
+            self.m3ufile.name,
+            self.m3ufile.parent,
+            filelist,
+        )
 
     def ogg_tracks(self):
         self.oggs = []
         self.oggdir = set()
         for self.tracknumber, self.oggfile in enumerate(
-                self.oggtracks):
+                self.playlist.m3ulist):
             oggglobbed = self.get_oggglob()
 
             self.oggfile = oggglobbed[0]
@@ -110,3 +108,6 @@ class NumberFiles(object):
                 shmove(
                         self.m3ufile,
                         os.path.join(oggdir, self.playlist.m3ufilename))
+
+    def get_playlists(self):
+        return self.playlists

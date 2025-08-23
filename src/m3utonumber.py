@@ -17,7 +17,15 @@ click_path = click.Path(
 def m3utonumber(src):
     nf = NumberFiles(src)
     m3ufiles = nf.get_m3ufiles()
-    print(f"{m3ufiles}")
+    m3ufiles_min1 = m3ufiles[-1]
+    nf.list_playlists()
+    pls = nf.get_playlists()
+    pls_min1 = pls[-1]
+
+    print(f"{m3ufiles_min1}")
+    print(f"{m3ufiles_min1.parent}")
+    print(f"{m3ufiles_min1.name}")
+    print(f"{pls_min1}")
 
 
 if __name__ == '__main__':
