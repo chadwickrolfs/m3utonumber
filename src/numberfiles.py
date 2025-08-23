@@ -1,6 +1,5 @@
 import os
 from shutil import move as shmove
-from pathlib import Path
 
 
 class NumberFiles(object):
@@ -12,7 +11,7 @@ class NumberFiles(object):
 
     def __init__(self, dirtowalk):
         '''click '''
-        self.dirtowalk = Path(dirtowalk)
+        self.dirtowalk = dirtowalk
 
     def numberfiles(self):
         m3ufiles = self.get_m3ufiles()
