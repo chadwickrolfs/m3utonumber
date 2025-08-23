@@ -1,5 +1,4 @@
 import os
-import os.path as ospath
 from shutil import move as shmove
 from pathlib import Path
 
@@ -20,7 +19,8 @@ class NumberFiles(object):
 
         for self.m3ufile in m3ufiles:
             print(f'\nDEBUG:\nm3ufile: {self.m3ufile}\n')
-            self.m3udir, self.m3ufilename = ospath.split(self.m3ufile)
+            self.m3udir = self.m3ufile.parent
+            self.m3ufilename = self.m3ufile.name
             if f'{self.m3udir}{os.sep}' == self.dirtowalk:
                 continue
 
@@ -39,13 +39,13 @@ class NumberFiles(object):
                 print(f'\nHANDMATIG INTERVENTIE VERREIST\n{e}')
                 continue
 
-    def get_oggtracks(self):
-        with open(self.m3ufile) as m3ufile_h:
-            return m3ufile_h.readlines()
-
     def get_m3ufiles(self):
         m3uglob = '*.m3u'
         return sorted(self.dirtowalk.rglob(m3uglob))
+
+    def get_oggtracks(self):
+        with open(self.m3ufile) as m3ufile_h:
+            return m3ufile_h.readlines()
 
     def ogg_tracks(self):
         self.oggs = []
@@ -56,8 +56,7 @@ class NumberFiles(object):
 
             self.oggfile = oggglobbed[0]
 
-            self.oggdirname = ospath.dirname(self.oggfile)
-            self.oggdir.add(self.oggdirname)
+            self.oggdir.add(self.oggfile.parent)
 
             if self.oggfilename[0:2].isdigit():
                 self.oggs.append(f'{self.oggfilename}\n')
@@ -68,14 +67,13 @@ class NumberFiles(object):
         self.move_m3ufile()
 
     def get_oggglob(self):
-        self.oggfilename = ospath.basename(self.oggfile).strip()
-        oggglob = f'*{self.oggfilename}'
+        oggglob = f'*{self.oggfile.name}'
         return sorted(self.dirtowalk.rglob(oggglob))
 
     def move_oggfile(self):
         numberedogg = f'{self.tracknumber:#02}-{self.oggfilename}'
         self.oggs.append(f'{numberedogg}\n')
-        shmove(self.oggfile, ospath.join(self.oggdirname, numberedogg))
+        shmove(self.oggfile, self.oggfile.parent.joinpath(numberedogg))
 
     def write_m3ufile(self):
         with open(self.m3ufile, 'w') as m3ufile_h:
