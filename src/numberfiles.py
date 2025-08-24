@@ -4,16 +4,19 @@ from shutil import move as shmove
 
 
 @dataclass
-class playlist:
-    m3uname: str
-    m3udir: str
-    m3ulist: list
-
-
-@dataclass
 class playfile:
     position: int
     original_path: str
+
+
+@dataclass(repr=False)
+class playlist:
+    m3uname: str
+    m3udir: str
+    m3ulist: list[playfile]
+
+    def __repr__(self):
+        return self.m3uname
 
 
 class NumberFiles(object):
