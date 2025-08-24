@@ -62,6 +62,7 @@ class NumberFiles(object):
                 playfile(pos, listfile)
                 for pos, listfile
                 in enumerate(self.m3ufile.read_text().split("\n"))
+                if listfile
         ]
         self.playlist = playlist(
             self.m3ufile.name,
