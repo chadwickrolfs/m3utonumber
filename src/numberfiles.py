@@ -1,4 +1,5 @@
 import os
+import pathlib
 from dataclasses import dataclass
 from shutil import move as shmove
 
@@ -54,6 +55,23 @@ class NumberFiles(object):
             except IndexError as e:
                 print(f'\nHANDMATIG INTERVENTIE VERREIST\n{e}')
                 continue
+
+    def check_playlists(self):
+        """check that files exist for this playlist
+        """
+        for pl in self.playlists:
+            # TODO: use iterdir or glob ?
+            actual_list = [
+                pfile.name
+                for pfile
+                in pathlib.Path(pl.m3udir).iterdir()
+            ]
+            print(f"actual: {actual_list}")
+            for mfile in pl.m3ulist:
+                if mfile.original_path in actual_list:
+                    print(f"{mfile.original_path} WEL found")
+                else:
+                    print(f"{mfile.original_path} not found")
 
     def get_m3ufiles(self):
         m3uglob = '*.m3u'
