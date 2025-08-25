@@ -56,23 +56,6 @@ class NumberFiles(object):
                 print(f'\nHANDMATIG INTERVENTIE VERREIST\n{e}')
                 continue
 
-    def check_playlists(self):
-        """check that files exist for this playlist
-        """
-        for pl in self.playlists:
-            # TODO: use iterdir or glob ?
-            actual_list = [
-                pfile.name
-                for pfile
-                in pathlib.Path(pl.m3udir).iterdir()
-            ]
-            print(f"actual: {actual_list}")
-            for mfile in pl.m3ulist:
-                if mfile.original_path in actual_list:
-                    print(f"{mfile.original_path} WEL found")
-                else:
-                    print(f"{mfile.original_path} not found")
-
     def get_m3ufiles(self):
         m3uglob = '*.m3u'
         self.m3ufiles = sorted(self.dirtowalk.rglob(m3uglob))
@@ -90,6 +73,28 @@ class NumberFiles(object):
             self.m3ufile.parent,
             filelist,
         )
+
+    def check_playlists(self):
+        """check that files exist for all playlists
+        hmm.. sometimes the file is named something else
+        like the filename on disk is shortened
+        maybe make a list of
+        - bad playlists
+        - which files have issues
+        return the list then fix that list ?
+        """
+        for pl in self.playlists:
+            m3udir_path = pathlib.Path(pl.m3udir)
+            actual_oggs = [
+                pfile.name
+                for pfile
+                in m3udir_path.glob("**/*.ogg")
+            ]
+            print(f"{pl.m3udir} actual: {actual_oggs}")
+            for mfile in pl.m3ulist:
+                file_path = pathlib.Path(mfile.original_path)
+                if file_path.name not in actual_oggs:
+                    print(f"{mfile.original_path} not found")
 
     def ogg_tracks(self):
         self.oggs = []
